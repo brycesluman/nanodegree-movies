@@ -1,10 +1,7 @@
 package org.sluman.movies;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
 /**
  * Created by bryce on 3/18/16.
@@ -15,9 +12,6 @@ public class Utility {
 
     public static String getPreferredType(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.pref_key), Context.MODE_PRIVATE);
-        //PreferenceManager.getDefaultSharedPreferences(context);
-        Log.d("Utility", prefs.getString(context.getString(R.string.pref_key),
-                context.getString(R.string.popular)));
         return prefs.getString(context.getString(R.string.pref_key),
                 context.getString(R.string.popular));
     }

@@ -9,20 +9,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import org.sluman.movies.data.MoviesContract;
-import org.sluman.movies.dummy.DummyContent;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -78,9 +74,6 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         super.onCreate(savedInstanceState);
 
         if (getArguments().containsKey(ARG_URI)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
             mUri = getArguments().getParcelable(ARG_URI);
             if(mUri!=null) {
                 Log.d("MovieDetailFragment", mUri.toString());

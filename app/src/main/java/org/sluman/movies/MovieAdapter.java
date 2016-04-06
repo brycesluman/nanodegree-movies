@@ -1,23 +1,15 @@
 package org.sluman.movies;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
-import org.sluman.movies.data.MoviesContract;
-import org.sluman.movies.dummy.DummyContent;
 
 /**
  * Created by bryce on 3/18/16.
@@ -25,7 +17,6 @@ import org.sluman.movies.dummy.DummyContent;
 public class MovieAdapter
         extends RecyclerView.Adapter<MovieAdapter.ViewHolder> {
     private static final int VIEW_TYPE_POSTER = 0;
-    private static final int VIEW_TYPE_COUNT = 1;
 
     //private final List<DummyContent.DummyItem> mValues;
     static CursorAdapter mCursorAdapter;
@@ -69,13 +60,10 @@ public class MovieAdapter
                         break;
                     }
                 }
-                Log.d("MovieAdapter", "ID:" + cursor.getInt(MovieListActivity.COL_MOVIE_ID));
 
                 String posterSuffix = cursor.getString(MovieListActivity.COL_POSTER_PATH);
                 Picasso.with(context).load(Utility.getPosterPathForResource(posterSuffix)).into(viewHolder.mIconView);
                 viewHolder.mMovieId = cursor.getInt(MovieListActivity.COL_MOVIE_ID);
-
-
             }
         };
     }
@@ -106,12 +94,10 @@ public class MovieAdapter
         public final View mView;
         public int mMovieId;
         public final ImageView mIconView;
-        //public final TextView mTitleView;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            //mTitleView = (TextView) view.findViewById(R.id.movie_title);
             mIconView = (ImageView) view.findViewById(R.id.posterImage);
             view.setOnClickListener(this);
         }
