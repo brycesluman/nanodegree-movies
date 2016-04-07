@@ -94,7 +94,7 @@ public class MovieListActivity extends AppCompatActivity implements
 
                                         SharedPreferences.Editor editor = sharedPref.edit();
                                         editor.putString(getString(R.string.pref_key), values[which]);
-                                        editor.commit();
+                                        editor.apply();
                                     }
                                 });
                 AlertDialog alertDialog = builder.create();
@@ -116,7 +116,7 @@ public class MovieListActivity extends AppCompatActivity implements
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-
+        MoviesSyncAdapter.initializeSyncAdapter(this);
         getSupportLoaderManager().initLoader(MOVIE_LOADER, null, this);
     }
 
@@ -146,6 +146,7 @@ public class MovieListActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mRecyclerView.removeAllViews();
         mMovieAdapter.swapCursor(cursor);
+        mRecyclerView.swapAdapter(mMovieAdapter,true);
     }
 
     @Override
@@ -190,7 +191,7 @@ public class MovieListActivity extends AppCompatActivity implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_key))) {
-            MoviesSyncAdapter.syncImmediately(this);
+            //MoviesSyncAdapter.syncImmediately(this);
             getSupportLoaderManager().restartLoader(MOVIE_LOADER, null, this);
         }
     }
