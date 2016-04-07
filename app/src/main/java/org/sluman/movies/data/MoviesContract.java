@@ -52,4 +52,7 @@ public class MoviesContract {
             return uri.getPathSegments().get(1);
         }
     }
+    public static final class VideoEntry implements BaseColumns {}
+
+    public static final class ReviewEntry implements BaseColumns {}
 }

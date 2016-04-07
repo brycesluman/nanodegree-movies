@@ -28,6 +28,8 @@ import org.sluman.movies.data.MoviesContract;
  */
 public class MovieDetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int MOVIE_LOADER = 0;
+    private static final int VIDEO_LOADER = 1;
+    private static final int REVIEW_LOADER = 2;
     private Uri mUri;
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -123,19 +125,31 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        if(cursor!=null && cursor.moveToFirst()) {
-            if(mAppBarLayout!=null) {
-                mAppBarLayout.setTitle(cursor.getString(COL_TITLE));
-            }
+        switch (cursorLoader.getId()) {
+            case 0:
+                if(cursor!=null && cursor.moveToFirst()) {
+                    if(mAppBarLayout!=null) {
+                        mAppBarLayout.setTitle(cursor.getString(COL_TITLE));
+                    }
 
-            Log.d("MovieDetailFragment", cursor.getString(MovieDetailFragment.COL_TITLE));
-            String posterSuffix = cursor.getString(MovieDetailFragment.COL_POSTER_PATH);
-            Picasso.with(getActivity()).load(Utility.getPosterPathForResource(posterSuffix)).into(mIconView);
-            mDescription.setText(cursor.getString(MovieDetailFragment.COL_OVERVIEW));
-            mReleaseDate.setText(cursor.getString(MovieDetailFragment.COL_RELEASE_DATE));
-            mVoteAverage.setText(cursor.getString(MovieDetailFragment.COL_VOTE_AVERAGE));
-
+                    Log.d("MovieDetailFragment", cursor.getString(MovieDetailFragment.COL_TITLE));
+                    String posterSuffix = cursor.getString(MovieDetailFragment.COL_POSTER_PATH);
+                    Picasso.with(getActivity()).load(Utility.getPosterPathForResource(posterSuffix)).into(mIconView);
+                    mDescription.setText(cursor.getString(MovieDetailFragment.COL_OVERVIEW));
+                    mReleaseDate.setText(cursor.getString(MovieDetailFragment.COL_RELEASE_DATE));
+                    mVoteAverage.setText(cursor.getString(MovieDetailFragment.COL_VOTE_AVERAGE));
+                }
+                break;
+            case 1:
+                // do some other stuff here
+                break;
+            case 2:
+                // do some more stuff here
+                break;
+            default:
+                break;
         }
+
     }
 
     @Override
