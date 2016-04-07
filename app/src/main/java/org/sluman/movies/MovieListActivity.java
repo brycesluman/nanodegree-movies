@@ -19,6 +19,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -40,7 +41,7 @@ public class MovieListActivity extends AppCompatActivity implements
         SharedPreferences.OnSharedPreferenceChangeListener {
     private int mPosition;
 
-    private static final int MOVIE_LOADER = 0;
+    private static final int MOVIE_LOADER = 2010;
 
     // For the movie view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -64,6 +65,7 @@ public class MovieListActivity extends AppCompatActivity implements
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+    private boolean mClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,28 +80,12 @@ public class MovieListActivity extends AppCompatActivity implements
 
         SharedPreferences prefs = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
         prefs.registerOnSharedPreferenceChangeListener(this);
+        final AlertDialog alertDialog = buildAlertDialog();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
-                builder.setTitle(R.string.pref_label)
-                        .setItems(R.array.pref_options,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Resources res = getResources();
-                                        String[] values = res.getStringArray(R.array.pref_values);
-                                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
-
-                                        SharedPreferences.Editor editor = sharedPref.edit();
-                                        editor.putString(getString(R.string.pref_key), values[which]);
-                                        editor.apply();
-                                    }
-                                });
-                AlertDialog alertDialog = builder.create();
-
-                // show it
                 alertDialog.show();
             }
         });
@@ -116,8 +102,31 @@ public class MovieListActivity extends AppCompatActivity implements
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
+
         MoviesSyncAdapter.initializeSyncAdapter(this);
+        Log.d("MovieListActivity", "initLoader: " + MOVIE_LOADER);
         getSupportLoaderManager().initLoader(MOVIE_LOADER, null, this);
+    }
+
+    private AlertDialog buildAlertDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
+        builder.setTitle(R.string.pref_label)
+                .setItems(R.array.pref_options,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d("MovieListActivity", "Click: " + which);
+                                mClicked = true;
+                                Resources res = getResources();
+                                String[] values = res.getStringArray(R.array.pref_values);
+                                SharedPreferences sharedPref = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
+
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString(getString(R.string.pref_key), values[which]);
+                                editor.apply();
+
+                            }
+                        });
+        return builder.create();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -144,14 +153,18 @@ public class MovieListActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mRecyclerView.removeAllViews();
+        Log.d("MovieListActivity", "onLoadFinished");
         mMovieAdapter.swapCursor(cursor);
-        mRecyclerView.swapAdapter(mMovieAdapter,true);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mMovieAdapter.swapCursor(null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -190,9 +203,11 @@ public class MovieListActivity extends AppCompatActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_key))) {
-            //MoviesSyncAdapter.syncImmediately(this);
+        if (key.equals(getString(R.string.pref_key)) && mClicked) {
+            MoviesSyncAdapter.syncImmediately(this);
+            Log.d("MovieListActivity", "restartLoader: " + MOVIE_LOADER);
             getSupportLoaderManager().restartLoader(MOVIE_LOADER, null, this);
+            mClicked = false;
         }
     }
 

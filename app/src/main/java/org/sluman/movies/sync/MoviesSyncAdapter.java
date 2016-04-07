@@ -211,7 +211,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 //              delete old records
                 Calendar rightNow = Calendar.getInstance();
                 rightNow.add(Calendar.DAY_OF_MONTH, -1);
-                String where = MoviesContract.MovieEntry.COLUMN_MOVIE_TYPE + " <= ?";
+                String where = MoviesContract.MovieEntry.COLUMN_DATE + " < ?";
                 String[] args = new String[] { rightNow.getTimeInMillis()+"" };
                 deleted = mContentResolver.delete(MoviesContract.MovieEntry.CONTENT_URI, where, args);
                 //insert the new ones
