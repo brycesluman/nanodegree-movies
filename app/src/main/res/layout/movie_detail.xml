@@ -21,7 +21,6 @@
                       android:orientation="vertical"
                       android:layout_weight="1"
         >
-
             <TextView android:id="@+id/movie_year"
                       xmlns:android="http://schemas.android.com/apk/res/android"
                       xmlns:tools="http://schemas.android.com/tools"
@@ -30,6 +29,14 @@
                       android:padding="16dp"
                       android:textIsSelectable="true"
                       tools:context="org.sluman.movies.MovieDetailFragment"/>
+            <!--<TextView android:id="@+id/movie_duration"-->
+                      <!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+                      <!--xmlns:tools="http://schemas.android.com/tools"-->
+                      <!--android:layout_width="match_parent"-->
+                      <!--android:layout_height="match_parent"-->
+                      <!--android:padding="16dp"-->
+                      <!--android:textIsSelectable="true"-->
+                      <!--tools:context="org.sluman.movies.MovieDetailFragment"/>-->
             <TextView android:id="@+id/movie_vote_average"
                       xmlns:android="http://schemas.android.com/apk/res/android"
                       xmlns:tools="http://schemas.android.com/tools"
