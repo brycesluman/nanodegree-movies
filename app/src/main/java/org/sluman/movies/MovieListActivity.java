@@ -65,7 +65,8 @@ public class MovieListActivity extends AppCompatActivity implements
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
-    private boolean mClicked = false;
+
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,14 +79,30 @@ public class MovieListActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
-        prefs.registerOnSharedPreferenceChangeListener(this);
-        final AlertDialog alertDialog = buildAlertDialog();
+
+        mPrefs = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getSupportActionBar().getThemedContext());
+                builder.setTitle(R.string.pref_label)
+                        .setItems(R.array.pref_options,
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Resources res = getResources();
+                                        String[] values = res.getStringArray(R.array.pref_values);
+
+                                        SharedPreferences.Editor editor = mPrefs.edit();
+                                        editor.putString(getString(R.string.pref_key), values[which]);
+                                        editor.apply();
+                                    }
+                                });
+                AlertDialog alertDialog = builder.create();
+
+                // show it
                 alertDialog.show();
             }
         });
@@ -115,7 +132,6 @@ public class MovieListActivity extends AppCompatActivity implements
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d("MovieListActivity", "Click: " + which);
-                                mClicked = true;
                                 Resources res = getResources();
                                 String[] values = res.getStringArray(R.array.pref_values);
                                 SharedPreferences sharedPref = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
@@ -136,6 +152,11 @@ public class MovieListActivity extends AppCompatActivity implements
         recyclerView.setAdapter(mMovieAdapter);
     }
 
+    @Override
+    protected void onPause() {
+        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -160,11 +181,6 @@ public class MovieListActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mMovieAdapter.swapCursor(null);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     @Override
@@ -203,11 +219,10 @@ public class MovieListActivity extends AppCompatActivity implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_key)) && mClicked) {
+        if (key.equals(getString(R.string.pref_key))) {
             MoviesSyncAdapter.syncImmediately(this);
             Log.d("MovieListActivity", "restartLoader: " + MOVIE_LOADER);
             getSupportLoaderManager().restartLoader(MOVIE_LOADER, null, this);
-            mClicked = false;
         }
     }
 
