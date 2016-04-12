@@ -1,6 +1,7 @@
 package org.sluman.movies;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -79,6 +80,9 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
             mUri = getArguments().getParcelable(ARG_URI);
             if(mUri!=null) {
                 Log.d("MovieDetailFragment", mUri.toString());
+                int movieId = MoviesContract.MovieEntry.getMovieIdFromUri(mUri);
+                FetchVideosTask fvTask = new FetchVideosTask(getContext());
+                fvTask.execute(movieId);
             }
         }
     }
@@ -93,13 +97,15 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         mVoteAverage = (TextView) rootView.findViewById(R.id.movie_vote_average);
         mDescription = (TextView) rootView.findViewById(R.id.movie_description);
         mReleaseDate = (TextView) rootView.findViewById(R.id.movie_year);
-
+        //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=nIGtF3J5kn8")));
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+        getLoaderManager().initLoader(VIDEO_LOADER, null, this);
+        getLoaderManager().initLoader(REVIEW_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 

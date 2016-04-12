@@ -14,6 +14,7 @@ public class MoviesContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_MOVIES = "movies";
+    public static final String PATH_VIDEOS = "videos";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
@@ -52,7 +53,39 @@ public class MoviesContract {
             return uri.getPathSegments().get(1);
         }
     }
-    public static final class VideoEntry implements BaseColumns {}
+    public static final class VideoEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_VIDEOS).build();
 
-    public static final class ReviewEntry implements BaseColumns {}
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_VIDEOS;
+
+        public static final String TABLE_NAME = "videos";
+
+        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_MOVIE_ID = "movie_id";
+        public static final String COLUMN_KEY = "key";
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_SITE = "site";
+        public static final String COLUMN_SIZE = "size";
+        public static final String COLUMN_TYPE = "type";
+        public static Uri buildVideosUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+        public static int getVideoIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+    }
+
+    public static final class ReviewEntry implements BaseColumns {
+//        {
+//            "id": "56f4f0bd9251417a440017bd",
+//                "author": "Rahul Gupta",
+//                "content": "Awesome moview. Best Action sequence.\r\n\r\n**Slow in the first half**",
+//                "url": "https://www.themoviedb.org/review/56f4f0bd9251417a440017bd"
+//        }
+
+    }
 }

@@ -64,6 +64,7 @@ public class MovieListActivity extends AppCompatActivity implements
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +77,8 @@ public class MovieListActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
-        SharedPreferences prefs = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
-        prefs.registerOnSharedPreferenceChangeListener(this);
+        mPrefs = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -90,11 +91,10 @@ public class MovieListActivity extends AppCompatActivity implements
                                     public void onClick(DialogInterface dialog, int which) {
                                         Resources res = getResources();
                                         String[] values = res.getStringArray(R.array.pref_values);
-                                        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.pref_key), Context.MODE_PRIVATE);
 
-                                        SharedPreferences.Editor editor = sharedPref.edit();
+                                        SharedPreferences.Editor editor = mPrefs.edit();
                                         editor.putString(getString(R.string.pref_key), values[which]);
-                                        editor.commit();
+                                        editor.apply();
                                     }
                                 });
                 AlertDialog alertDialog = builder.create();
@@ -127,6 +127,11 @@ public class MovieListActivity extends AppCompatActivity implements
         recyclerView.setAdapter(mMovieAdapter);
     }
 
+    @Override
+    protected void onPause() {
+        mPrefs.unregisterOnSharedPreferenceChangeListener(this);
+        super.onPause();
+    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
