@@ -9,6 +9,7 @@
         android:id="@+id/list_author"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingBottom="10dp"
+        android:textStyle="bold"
     />
     <TextView
         android:id="@+id/list_content"

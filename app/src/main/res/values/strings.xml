@@ -21,4 +21,6 @@
     <string name="title_favorites">Favorite Movies</string>
     <string name="title_top_rated">Top Rated Movies</string>
     <string name="title_popular">Popular Movies</string>
+    <string name="vote_average">VOTE AVERAGE</string>
+    <string name="year_released">RELEASE DATE</string>
 </resources>
