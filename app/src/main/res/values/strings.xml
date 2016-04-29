@@ -12,4 +12,13 @@
     <string name="pref_label_top_rated">Top Rated</string>
     <string name="pref_label_popular">Popular</string>
     <string name="pref_label">Sort By</string>
+    <string name="reviews">REVIEWS</string>
+    <string name="trailers">TRAILERS</string>
+    <string name="please_select">Please select a movie to view</string>
+    <string name="action_share">Share</string>
+    <string name="favorites_key">favorites</string>
+    <string name="favorites_label">Favorites</string>
+    <string name="title_favorites">Favorite Movies</string>
+    <string name="title_top_rated">Top Rated Movies</string>
+    <string name="title_popular">Popular Movies</string>
 </resources>

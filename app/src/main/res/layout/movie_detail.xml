@@ -1,3 +1,8 @@
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -46,6 +51,14 @@
                       android:textIsSelectable="true"
                       tools:context="org.sluman.movies.MovieDetailFragment"/>
         </LinearLayout>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_star_border_white_24dp"
+            app:layout_anchor="@+id/movie_detail_container"
+            app:layout_anchorGravity="top|end" />
     </LinearLayout>
     <TextView android:id="@+id/movie_description"
               xmlns:android="http://schemas.android.com/apk/res/android"
@@ -55,5 +68,53 @@
               android:padding="16dp"
               android:textIsSelectable="true"
               tools:context="org.sluman.movies.MovieDetailFragment"/>
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/trailers"
+              android:paddingLeft="16dp"
+    />
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                                            xmlns:tools="http://schemas.android.com/tools"
+                                            android:id="@+id/video_list"
+                                            android:name="org.sluman.movies.MovieDetailFragment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            app:layoutManager="GridLayoutManager"
+                                            tools:context="org.sluman.movies.MovieDetailFragment"
+                                            tools:listitem="@layout/video_list_content"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginLeft="16dp"
+                                            android:layout_marginRight="16dp"
+                                            android:layout_marginBottom="16dp"
+                                            android:background="@drawable/borders"
+
+    />
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/reviews"
+              android:paddingLeft="16dp"
+    />
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+                                            xmlns:app="http://schemas.android.com/apk/res-auto"
+                                            xmlns:tools="http://schemas.android.com/tools"
+                                            android:id="@+id/review_list"
+                                            android:name="org.sluman.movies.MovieDetailFragment"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="match_parent"
+                                            app:layoutManager="GridLayoutManager"
+                                            tools:context="org.sluman.movies.MovieDetailFragment"
+                                            tools:listitem="@layout/review_list_content"
+                                            android:layout_marginTop="10dp"
+                                            android:layout_marginLeft="16dp"
+                                            android:layout_marginRight="16dp"
+                                            android:layout_marginBottom="16dp"
+                                            android:padding="16dp"
+                                            android:background="@drawable/borders"
+
+    />
+
 </LinearLayout>
 
+</ScrollView>

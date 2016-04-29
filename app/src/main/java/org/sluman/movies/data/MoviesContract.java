@@ -15,6 +15,8 @@ public class MoviesContract {
 
     public static final String PATH_MOVIES = "movies";
     public static final String PATH_VIDEOS = "videos";
+    public static final String PATH_REVIEWS = "reviews";
+    public static final String PATH_TYPES = "types";
 
     public static final class MovieEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
@@ -53,6 +55,7 @@ public class MoviesContract {
             return uri.getPathSegments().get(1);
         }
     }
+
     public static final class VideoEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_VIDEOS).build();
@@ -64,22 +67,35 @@ public class MoviesContract {
 
         public static final String TABLE_NAME = "videos";
 
-        public static final String COLUMN_ID = "id";
-        public static final String COLUMN_MOVIE_ID = "movie_id";
+
+        public static final String COLUMN_VIDEO_ID = "id";
+        public static final String COLUMN_FOREIGN_KEY = "foreign_key";
+        public static final String COLUMN_MOVIEDB_ID = "movie_id";
         public static final String COLUMN_KEY = "key";
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_SITE = "site";
         public static final String COLUMN_SIZE = "size";
         public static final String COLUMN_TYPE = "type";
+
+
         public static Uri buildVideosUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
         public static int getVideoIdFromUri(Uri uri) {
             return Integer.parseInt(uri.getPathSegments().get(1));
         }
     }
 
     public static final class ReviewEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEWS).build();
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEWS;
+
+        public static final String TABLE_NAME = "reviews";
 //        {
 //            "id": "56f4f0bd9251417a440017bd",
 //                "author": "Rahul Gupta",
@@ -87,5 +103,59 @@ public class MoviesContract {
 //                "url": "https://www.themoviedb.org/review/56f4f0bd9251417a440017bd"
 //        }
 
+        public static final String COLUMN_MOVIEDB_ID = "moviedb_id";
+        public static final String COLUMN_FOREIGN_KEY = "foreign_key";
+        public static final String COLUMN_REVIEW_ID = "id";
+        public static final String COLUMN_AUTHOR = "author";
+        public static final String COLUMN_CONTENT = "content";
+        public static final String COLUMN_URL = "url";
+
+        public static Uri buildReviewsUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static int getReviewIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
+    }
+
+    public static final class TypeEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TYPES).build();
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TYPES;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TYPES;
+
+        public static final String TABLE_NAME = "types";
+
+        public static final String COLUMN_FOREIGN_KEY = "foreign_key";
+
+        public static final String COLUMN_TYPE = "type";
+
+        public static Uri buildTypeUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static int getTypeIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(2));
+        }
+
+        public static String getTypeFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static Uri buildTypesWithTypeAndId(String type, int id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(type)
+                    .appendPath(Integer.toString(id))
+                    .build();
+        }
+
+        public static Uri buildTypesWithType(String type) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(type)
+                    .build();
+        }
     }
 }

@@ -44,6 +44,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     ContentResolver mContentResolver;
 
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+
     public MoviesSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContentResolver = context.getContentResolver();
@@ -122,8 +123,9 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         return;
     }
+
     public void getMovieDataFromJson(String forecastJsonStr,
-                                       String movieType)
+                                     String movieType)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -154,7 +156,6 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Insert the new movie information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
-
 
 
             Time dayTime = new Time();
@@ -189,7 +190,7 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 movieId = movieItem.getInt(OWM_MOVIE_ID);
                 title = movieItem.getString(OWM_TITLE);
                 voteAverage = movieItem.getDouble(OWM_VOTE_AVERAGE);
-
+                //Log.d("MoviesSyncAdapter",  "movieId: " + movieId);
                 ContentValues movieValues = new ContentValues();
 
                 movieValues.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, posterPath);
@@ -205,21 +206,12 @@ public class MoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             int inserted = 0;
-            int deleted = 0;
             // add to database
             if (cVVector.size() > 0) {
-//              delete old records
-                Calendar rightNow = Calendar.getInstance();
-                rightNow.add(Calendar.DAY_OF_MONTH, -1);
-                String where = MoviesContract.MovieEntry.COLUMN_DATE + " < ?";
-                String[] args = new String[] { rightNow.getTimeInMillis()+"" };
-                deleted = mContentResolver.delete(MoviesContract.MovieEntry.CONTENT_URI, where, args);
-                //insert the new ones
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = mContentResolver.bulkInsert(MoviesContract.MovieEntry.CONTENT_URI, cvArray);
             }
-            Log.d(LOG_TAG, "getMovieDataFromJson Complete. " + deleted + " Deleted");
             Log.d(LOG_TAG, "getMovieDataFromJson Complete. " + inserted + " Inserted");
 
         } catch (JSONException e) {

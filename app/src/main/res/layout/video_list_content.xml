@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:padding="10dp"
+>
+
+    <ImageView android:layout_height="48dp"
+               android:layout_width="48dp"
+               android:id="@+id/play_image"
+               android:src="@drawable/ic_play_arrow_black_24dp" />
+    <TextView
+        android:id="@+id/video_description"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+    />
+</LinearLayout>

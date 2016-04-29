@@ -2,28 +2,27 @@ package org.sluman.movies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
 
 /**
- * Created by bryce on 3/18/16.
+ * Created by bryce on 4/12/16.
  */
-public class MovieAdapter
-        extends CursorRecyclerViewAdapter<MovieAdapter.ViewHolder> {
-    private static final int VIEW_TYPE_POSTER = 0;
+public class VideosAdapter extends CursorRecyclerViewAdapter<VideosAdapter.ViewHolder> {
+    private static final int VIEW_TYPE_VIDEO = 0;
 
     private OnInteractionListener mListener;
 
     Context mContext;
-    public MovieAdapter(Context context, Cursor c) {
-        super(context,c);
+
+    public VideosAdapter(Context context, Cursor c) {
+        super(context, c);
         mContext = context;
 
         if (context instanceof OnInteractionListener) {
@@ -37,8 +36,8 @@ public class MovieAdapter
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = -1;
         switch (viewType) {
-            case VIEW_TYPE_POSTER: {
-                layoutId = R.layout.movie_list_content;
+            case VIEW_TYPE_VIDEO: {
+                layoutId = R.layout.video_list_content;
                 break;
             }
         }
@@ -55,42 +54,41 @@ public class MovieAdapter
 
         int viewType = getItemViewType(cursor.getPosition());
         switch (viewType) {
-            case VIEW_TYPE_POSTER: {
+            case VIEW_TYPE_VIDEO: {
                 break;
             }
         }
-        String posterSuffix = cursor.getString(MovieListActivity.COL_POSTER_PATH);
-        Picasso.with(mContext).load(Utility.getPosterPathForResource(posterSuffix)).into(viewHolder.mIconView);
-        viewHolder.mMovieId = cursor.getInt(MovieListActivity.COL_MOVIE_ID);
+        viewHolder.mVideoId = cursor.getString(MovieDetailFragment.COL_VIDEO_KEY);
+        viewHolder.mDescription.setText(cursor.getString(MovieDetailFragment.COL_VIDEO_NAME));
     }
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final View mView;
-        public int mMovieId;
-        public final ImageView mIconView;
+        public String mVideoId;
+        public TextView mDescription;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIconView = (ImageView) view.findViewById(R.id.posterImage);
+            mDescription = (TextView) view.findViewById(R.id.video_description);
             view.setOnClickListener(this);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mIconView.toString() + "'";
+            return super.toString() + " '" + mVideoId + "'";
         }
 
         @Override
         public void onClick(View v) {
             if (mListener != null) {
-                mListener.listItemHasBeenClicked(v, getAdapterPosition());
+                mListener.videoItemHasBeenClicked(v, getAdapterPosition());
             }
         }
     }
 
     public interface OnInteractionListener {
-        void listItemHasBeenClicked(View view, int position);
+        void videoItemHasBeenClicked(View view, int position);
     }
 }

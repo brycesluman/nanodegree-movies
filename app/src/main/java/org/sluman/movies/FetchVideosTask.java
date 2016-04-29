@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.format.Time;
@@ -14,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sluman.movies.data.MoviesContract;
+import org.sluman.movies.data.MoviesProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,17 +38,33 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
 
     private boolean DEBUG = true;
 
+    private long getMovieDbId(int id) {
+        long videoId = 0;
+        // First, check if the location with this city name exists in the db
+        Cursor videoCursor = mContext.getContentResolver().query(
+                MoviesContract.MovieEntry.buildMoviesUri(id),
+                new String[]{MoviesContract.MovieEntry.COLUMN_ID},
+                null,
+                null,
+                null);
+        if (videoCursor.moveToFirst()) {
+            int videoIdIndex = videoCursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_ID);
+            videoId = videoCursor.getLong(videoIdIndex);
+        }
 
+        videoCursor.close();
+        return videoId;
+    }
 
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
-     *
+     * <p/>
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
     public Void getVideosDataFromJson(String videosJsonStr,
-                                       int id)
+                                      int id)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -54,6 +72,7 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
         // into an Object hierarchy for us.
 
         // These are the names of the JSON objects that need to be extracted.
+        final String OWM_MDB_ID = "id";
         final String OWM_LIST = "results";
         final String OWM_ID = "id";
         final String OWM_KEY = "key";
@@ -63,11 +82,12 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
         final String OWM_TYPE = "type";
 
 
-
         try {
+            int moviedb_id;
             JSONObject videosJson = new JSONObject(videosJsonStr);
             JSONArray videosArray = videosJson.getJSONArray(OWM_LIST);
 
+            moviedb_id = videosJson.getInt(OWM_MDB_ID);
             // Insert the new weather information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(videosArray.length());
 
@@ -81,7 +101,7 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
             // now we work exclusively in UTC
             dayTime = new Time();
 
-            for(int i = 0; i < videosArray.length(); i++) {
+            for (int i = 0; i < videosArray.length(); i++) {
                 // These are the values that will be collected.
                 long dateTime;
                 String video_id;
@@ -95,7 +115,7 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
                 JSONObject videoObject = videosArray.getJSONObject(i);
 
                 // Cheating to convert this to UTC time, which is what we want anyhow
-                dateTime = dayTime.setJulianDay(julianStartDay+i);
+                dateTime = dayTime.setJulianDay(julianStartDay + i);
 
                 video_id = videoObject.getString(OWM_ID);
                 key = videoObject.getString(OWM_KEY);
@@ -106,8 +126,9 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
 
                 ContentValues videoValues = new ContentValues();
 
-                videoValues.put(MoviesContract.VideoEntry.COLUMN_MOVIE_ID, id);
-                videoValues.put(MoviesContract.VideoEntry.COLUMN_ID, video_id);
+                videoValues.put(MoviesContract.VideoEntry.COLUMN_FOREIGN_KEY, id);
+                videoValues.put(MoviesContract.VideoEntry.COLUMN_MOVIEDB_ID, moviedb_id);
+                videoValues.put(MoviesContract.VideoEntry.COLUMN_VIDEO_ID, video_id);
                 videoValues.put(MoviesContract.VideoEntry.COLUMN_KEY, key);
                 videoValues.put(MoviesContract.VideoEntry.COLUMN_NAME, name);
                 videoValues.put(MoviesContract.VideoEntry.COLUMN_SIZE, size);
@@ -119,12 +140,11 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
 
             int inserted = 0;
             // add to database
-            if ( cVVector.size() > 0 ) {
+            if (cVVector.size() > 0) {
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = mContext.getContentResolver().bulkInsert(MoviesContract.VideoEntry.CONTENT_URI, cvArray);
             }
-
             Log.d(LOG_TAG, "FetchVideosTask Complete. " + inserted + " Inserted");
 
         } catch (JSONException e) {
@@ -142,6 +162,8 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
         }
         int MOVIE_ID = params[0];
 
+        long MOVIEDB_ID = getMovieDbId(MOVIE_ID);
+        Log.d("FetchVideosTask", "movieDbId: " + MOVIEDB_ID);
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -158,8 +180,8 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
                     "https://api.themoviedb.org/3/movie/";
             final String APPID_PARAM = "api_key";
             Uri builtUri = Uri.parse(VIDEOS_BASE_URL).buildUpon()
-                    .appendPath(String.valueOf(MOVIE_ID))
-                    .appendPath("reviews")
+                    .appendPath(String.valueOf(MOVIEDB_ID))
+                    .appendPath("videos")
                     .appendQueryParameter(APPID_PARAM, BuildConfig.MOVIE_DB_API_KEY)
                     .build();
             Log.d(LOG_TAG, builtUri.toString());
@@ -221,15 +243,4 @@ public class FetchVideosTask extends AsyncTask<Integer, Void, Void> {
         // This will only happen if there was an error getting or parsing the forecast.
         return null;
     }
-
-//    @Override
-//    protected void onPostExecute(String[] result) {
-//        if (result != null && mForecastAdapter != null) {
-//            mForecastAdapter.clear();
-//            for(String dayForecastStr : result) {
-//                mForecastAdapter.add(dayForecastStr);
-//            }
-//            // New data is back from the server.  Hooray!
-//        }
-//    }
 }
