@@ -1,15 +1,25 @@
 package org.sluman.movies;
 
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Movie;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+
+import org.sluman.movies.data.MoviesContract;
 
 /**
  * An activity representing a single Movie detail screen. This
@@ -17,7 +27,11 @@ import android.view.MenuItem;
  * item details are presented side-by-side with a list of items
  * in a {@link MovieListActivity}.
  */
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements
+        VideosAdapter.OnInteractionListener,
+        MovieDetailFragment.FavoriteStatusListener {
+    FloatingActionButton mFab;
+    boolean mFavoriteStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +58,24 @@ public class MovieDetailActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.movie_detail_container, fragment)
                     .commit();
+
+            mFab = (FloatingActionButton) findViewById(R.id.fab_detail);
+            if (mFab != null) {
+                mFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Uri inUri = getIntent().getData();
+                        if (mFavoriteStatus) {
+                            Utility.removeFavorite(getApplicationContext(),
+                                    MoviesContract.MovieEntry.getMovieIdFromUri(inUri));
+                        } else {
+                            Utility.addFavorite(getApplicationContext(), MoviesContract.MovieEntry.getMovieIdFromUri(inUri));
+                        }
+                    }
+                });
+            }
         }
+
     }
 
     @Override
@@ -68,6 +99,28 @@ public class MovieDetailActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(title);
+        }
+    }
+
+    @Override
+    public void videoItemHasBeenClicked(View view, int position) {
+        VideosAdapter.ViewHolder viewHolder = (VideosAdapter.ViewHolder) view.getTag();
+        String key = viewHolder.mVideoId;
+        if (key != null) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + key)));
+        }
+    }
+
+    @Override
+    public void favoriteStatus(boolean favorited) {
+        mFavoriteStatus = favorited;
+        if (mFab == null) {
+            return;
+        }
+        if (favorited) {
+            mFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_white_24dp, getTheme()));
+        } else {
+            mFab.setImageDrawable(getResources().getDrawable(R.drawable.ic_star_border_white_24dp, getTheme()));
         }
     }
 }

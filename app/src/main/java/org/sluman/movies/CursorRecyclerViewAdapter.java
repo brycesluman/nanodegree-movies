@@ -104,7 +104,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
      * closed.
      */
     public Cursor swapCursor(Cursor newCursor) {
-        Log.d("CursorRecyclerView", "swapCursor");
         if (newCursor == mCursor) {
             return null;
         }
@@ -119,7 +118,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
             }
             mRowIdColumn = newCursor.getColumnIndexOrThrow("_id");
             mDataValid = true;
-            Log.d("CursorRecyclerView", "notifyDataSetChanged()");
             notifyDataSetChanged();
         } else {
             mRowIdColumn = -1;
@@ -134,7 +132,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         @Override
         public void onChanged() {
             super.onChanged();
-            Log.d("CursorRecyclerView", "onChanged()");
             mDataValid = true;
             notifyDataSetChanged();
         }
@@ -142,7 +139,6 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         @Override
         public void onInvalidated() {
             super.onInvalidated();
-            Log.d("CursorRecyclerView", "onInvalidated()");
             mDataValid = false;
             notifyDataSetChanged();
             //There is no notifyDataSetInvalidated() method in RecyclerView.Adapter
