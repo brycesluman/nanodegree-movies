@@ -335,6 +335,9 @@ public class MovieDetailFragment extends Fragment
             case VIDEO_LOADER:
                 if (cursor != null && cursor.moveToFirst()) {
                     mShareKey = cursor.getString(MovieDetailFragment.COL_VIDEO_KEY);
+                    if (mShareActionProvider != null) {
+                        mShareActionProvider.setShareIntent(createShareTrailerIntent());
+                    }
                     mVideosAdapter.swapCursor(cursor);
                 }
                 break;
