@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -122,6 +123,8 @@ public class MovieDetailFragment extends Fragment
     private FloatingActionButton mFab;
     ShareActionProvider mShareActionProvider;
     private String mShareKey;
+    private String mShareTitle;
+
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -154,9 +157,15 @@ public class MovieDetailFragment extends Fragment
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
-        Log.d("MovieDetailFragment", "http://www.youtube.com/watch?v=" + mShareKey);
-        shareIntent.putExtra(Intent.EXTRA_TEXT,
-                "http://www.youtube.com/watch?v=" + mShareKey);
+        if (mShareKey != null) {
+            Log.d("MovieDetailFragment", "http://www.youtube.com/watch?v=" + mShareKey);
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    "http://www.youtube.com/watch?v=" + mShareKey);
+        } else {
+            //fall-back to search if there are no trailers available
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    "https://www.youtube.com/results?search_query=" + mShareTitle);
+        }
         return shareIntent;
     }
 
@@ -325,6 +334,7 @@ public class MovieDetailFragment extends Fragment
                     if (mAppBarLayout != null) {
                         mAppBarLayout.setTitle(cursor.getString(COL_TITLE));
                     }
+                    mShareTitle = TextUtilsCompat.htmlEncode(cursor.getString(COL_TITLE));
                     String posterSuffix = cursor.getString(MovieDetailFragment.COL_POSTER_PATH);
                     Picasso.with(getActivity()).load(Utility.getPosterPathForResource(posterSuffix)).into(mIconView);
                     mDescription.setText(cursor.getString(MovieDetailFragment.COL_OVERVIEW));
